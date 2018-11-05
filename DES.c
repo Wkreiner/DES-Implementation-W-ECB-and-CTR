@@ -197,11 +197,29 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
       int i = 0;
       uint64_t bitval = 0;
       for(i = 0; i < 7; i++) {
-        bitval = bitval | line[i];
-        printf("AAA: %c\n", line[i]);
+        //printf("Byte: %x\n", (uint8_t)line[i]);
+        //printf("%x::::\n", *((char*)&line[i]));
+        bitval = (bitval | line[i]);
+        //printf("AAA: %c\n", line[i]);
         bitval = bitval << 8;
-        printf("bitval: %x\n", bitval);
+        //printf("bitval: %x\n", bitval);
       }
+
+      /*
+      int value = -278;
+(I selected that value because it isn't very interesting for 125 - the least significant byte is 125 and the other bytes are all 0!)
+
+You first need a pointer to that value:
+
+int* pointer = &value;
+You can now typecast that to a 'char' pointer which is only one byte, and get the individual bytes by indexing.
+
+for (int i = 0; i < sizeof(value); i++) {
+    char thisbyte = *( ((char*) pointer) + i );
+    // do whatever processing you want.
+}
+
+      */
       printf("A: %s\n", line);
       printf("B: %x\n", (uint64_t)line);
       if(head == NULL)
