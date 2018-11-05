@@ -34,6 +34,8 @@ struct BLOCK {
 };
 typedef struct BLOCK* BLOCKLIST;
 
+struct BLOCK *head = NULL;
+
 /////////////////////////////////////////////////////////////////////////////
 // Initial and final permutation
 /////////////////////////////////////////////////////////////////////////////
@@ -183,16 +185,33 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
     // TODO
     // call pad_last_block() here to pad the last block!
     char line[8];
-
-    BLOCKLIST iteration = malloc(sizeof(BLOCKLIST));
-    if (iteration == NULL) {
-        return NULL;
+    while(fread(line, 1, 8, msg_fp) == 8)
+    {
+      BLOCKLIST iteration = malloc(sizeof(BLOCKLIST));
+      if (iteration == NULL) {
+          return NULL;
+      }
+      iteration->block = (uint64_t)strdup(line);
+      printf("%s\n", line);
+      printf("%x\n", (uint64_t)line);
+      if(head == NULL)
+      {
+        iteration->next = NULL;
+        iteration->size = 8;
+        head = iteration;
+      }
+      else {
+        iteration->next = head;
+        iteration->size = 8;
+        head = iteration;
+      }
     }
 
-    fread(line, 1, 8, msg_fp);
-    printf("%x\n", (uint64_t*)line);
-
-    //test at turning into hex representation 
+    //printf("%x\n", (uint64_t*)line);
+    printf("%x\n", head->block);
+    printf("%x\n", head->next->block);
+    /*
+    //test at turning into hex representation
     int i = 0;
     uint64_t intrep = 0;
     for(i = 0; i < 8; i++) {
@@ -204,6 +223,8 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
     printf("%64.64x\n", (uint64_t)intrep);
     printf("%8.8x\n", (uint64_t)line[0]);
     printf("%8.8x\n", (uint64_t)line[2]);
+    */
+
     exit(0);
    return NULL;
 }
