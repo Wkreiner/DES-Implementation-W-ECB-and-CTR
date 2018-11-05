@@ -184,7 +184,7 @@ BLOCKLIST pad_last_block(BLOCKLIST blocks) {
 BLOCKLIST read_cleartext_message(FILE *msg_fp) {
     // TODO
     // call pad_last_block() here to pad the last block!
-    char line[8];
+    char *line;
     while(fread(line, 1, 8, msg_fp) == 8)
     {
       BLOCKLIST iteration = malloc(sizeof(BLOCKLIST));
@@ -206,6 +206,25 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
         head = iteration;
       }
     }
+
+    line[strlen(line)-1] = '\0';
+    BLOCKLIST temp = malloc(sizeof(BLOCKLIST));
+    if (temp == NULL) {
+        return NULL;
+    }
+    temp->block = (uint64_t)strdup(line);
+    if(head == NULL)
+    {
+      temp->next = NULL;
+      temp->size = 8;
+      head = temp;
+    }
+    else {
+      temp->next = head;
+      temp->size = 8;
+      head = temp;
+    }
+
 
     //printf("%x\n", (uint64_t*)line);
     printf("%x\n", head->block);
