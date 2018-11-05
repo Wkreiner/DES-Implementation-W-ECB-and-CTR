@@ -231,27 +231,10 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
       head = temp;
     }
 
-
-    //printf("%x\n", (uint64_t*)line);
     printf("C: %s\n", head->block);
     printf("D: %s\n", head->next->block);
     printf("E: %s\n", head->next->next->block);
-    /*
-    //test at turning into hex representation
-    int i = 0;
-    uint64_t intrep = 0;
-    for(i = 0; i < 8; i++) {
-      intrep += (uint64_t)line[i];
-      intrep = intrep << 8;
-    }
-    intrep += (uint64_t)line[7];
-
-    printf("%64.64x\n", (uint64_t)intrep);
-    printf("%8.8x\n", (uint64_t)line[0]);
-    printf("%8.8x\n", (uint64_t)line[2]);
-    */
-
-    //exit(0);
+    
    return head;
 }
 
