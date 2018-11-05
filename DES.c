@@ -184,16 +184,26 @@ BLOCKLIST pad_last_block(BLOCKLIST blocks) {
 BLOCKLIST read_cleartext_message(FILE *msg_fp) {
     // TODO
     // call pad_last_block() here to pad the last block!
-    char *line;
-    while(fread(line, 1, 8, msg_fp) == 8)
+    char line[9];
+    int len;
+    while((len = fread(line, 1, 8, msg_fp)) && len == 8)
     {
       BLOCKLIST iteration = malloc(sizeof(BLOCKLIST));
       if (iteration == NULL) {
           return NULL;
       }
+      line[8] = '\0';
       iteration->block = (uint64_t)strdup(line);
-      printf("%s\n", line);
-      printf("%x\n", (uint64_t)line);
+      int i = 0;
+      uint64_t bitval = 0;
+      for(i = 0; i < 7; i++) {
+        bitval = bitval | line[i];
+        printf("AAA: %c\n", line[i]);
+        bitval = bitval << 8;
+        printf("bitval: %x\n", bitval);
+      }
+      printf("A: %s\n", line);
+      printf("B: %x\n", (uint64_t)line);
       if(head == NULL)
       {
         iteration->next = NULL;
@@ -206,8 +216,8 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
         head = iteration;
       }
     }
-
-    line[strlen(line)-1] = '\0';
+    line[len-1] = '\0';
+    printf("LASTLINE: %s\n", line);
     BLOCKLIST temp = malloc(sizeof(BLOCKLIST));
     if (temp == NULL) {
         return NULL;
@@ -227,8 +237,8 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
 
 
     //printf("%x\n", (uint64_t*)line);
-    printf("%x\n", head->block);
-    printf("%x\n", head->next->block);
+    printf("C: %x\n", head->block);
+    printf("D: %x\n", head->next->block);
     /*
     //test at turning into hex representation
     int i = 0;
