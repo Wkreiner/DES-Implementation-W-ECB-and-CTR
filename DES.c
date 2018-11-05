@@ -186,6 +186,7 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
     // call pad_last_block() here to pad the last block!
     char line[9];
     int len;
+    //make all 8 byte blocks... add null terminator
     while((len = fread(line, 1, 8, msg_fp)) && len == 8)
     {
       BLOCKLIST iteration = malloc(sizeof(BLOCKLIST));
@@ -194,32 +195,7 @@ BLOCKLIST read_cleartext_message(FILE *msg_fp) {
       }
       line[8] = '\0';
       iteration->block = (uint64_t)strdup(line);
-      int i = 0;
-      uint64_t bitval = 0;
-      for(i = 0; i < 7; i++) {
-        //printf("Byte: %x\n", (uint8_t)line[i]);
-        //printf("%x::::\n", *((char*)&line[i]));
-        bitval = (bitval | line[i]);
-        //printf("AAA: %c\n", line[i]);
-        bitval = bitval << 8;
-        //printf("bitval: %x\n", bitval);
-      }
 
-      /*
-      int value = -278;
-(I selected that value because it isn't very interesting for 125 - the least significant byte is 125 and the other bytes are all 0!)
-
-You first need a pointer to that value:
-
-int* pointer = &value;
-You can now typecast that to a 'char' pointer which is only one byte, and get the individual bytes by indexing.
-
-for (int i = 0; i < sizeof(value); i++) {
-    char thisbyte = *( ((char*) pointer) + i );
-    // do whatever processing you want.
-}
-
-      */
       printf("A: %s\n", line);
       printf("B: %x\n", (uint64_t)line);
       if(head == NULL)
@@ -234,6 +210,8 @@ for (int i = 0; i < sizeof(value); i++) {
         head = iteration;
       }
     }
+
+    //last line null terminator and block creation
     line[len-1] = '\0';
     printf("LASTLINE: %s\n", line);
     BLOCKLIST temp = malloc(sizeof(BLOCKLIST));
@@ -255,8 +233,9 @@ for (int i = 0; i < sizeof(value); i++) {
 
 
     //printf("%x\n", (uint64_t*)line);
-    printf("C: %x\n", head->block);
-    printf("D: %x\n", head->next->block);
+    printf("C: %s\n", head->block);
+    printf("D: %s\n", head->next->block);
+    printf("E: %s\n", head->next->next->block);
     /*
     //test at turning into hex representation
     int i = 0;
@@ -272,8 +251,8 @@ for (int i = 0; i < sizeof(value); i++) {
     printf("%8.8x\n", (uint64_t)line[2]);
     */
 
-    exit(0);
-   return NULL;
+    //exit(0);
+   return head;
 }
 
 // Reads the encrypted message, and returns a linked list of blocks, each 64 bits.
@@ -374,6 +353,7 @@ BLOCKLIST des_dec_CTR(BLOCKLIST msg) {
 void encrypt (int argc, char **argv) {
       FILE *msg_fp = fopen("message.txt", "r");
       BLOCKLIST msg = read_cleartext_message(msg_fp);
+      printf("A: %x %s", msg->next->block, msg->next->block);
       fclose(msg_fp);
 
       BLOCKLIST encrypted_message;
